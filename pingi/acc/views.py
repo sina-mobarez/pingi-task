@@ -6,9 +6,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.models import Token
 
-from .models import User
+from .models import Cuser
 from .serializers import LoginSerializer
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ class LoginAPIView(APIView):
         if serializer.is_valid():
             mobile = serializer.validated_data['mobile']
             
-            user, created = User.objects.get_or_create(mobile=mobile)
+            user, created = Cuser.objects.get_or_create(mobile=mobile)
             
             otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             
@@ -38,10 +37,8 @@ class LoginAPIView(APIView):
             
             logger.info(f"OTP [{mobile}] -> [{otp}]")
             
-            token, _ = Token.objects.get_or_create(user=user)
             
             return Response({
                 'message': 'OTP sent successfully',
-                'token': token.key
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

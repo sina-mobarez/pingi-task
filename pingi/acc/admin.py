@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import User, OTPLog
+from .models import Cuser, OTPLog
 
 # Register your models here.
 
-admin.site.register(User)
+admin.site.register(Cuser)
 admin.site.register(OTPLog)

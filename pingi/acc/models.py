@@ -19,7 +19,7 @@ class UserManager(BaseUserManager):
         return self.create_user(mobile, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class Cuser(AbstractBaseUser, PermissionsMixin):
     mobile = models.CharField(max_length=15, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -37,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class OTPLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Cuser, on_delete=models.CASCADE)
     otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
