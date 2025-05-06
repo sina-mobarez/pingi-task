@@ -2,13 +2,15 @@ import random
 import logging
 import redis
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 from .models import Cuser
-from .serializers import LoginSerializer
+from .serializers import LoginSerializer, NowSerializer, StatsSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +39,44 @@ class LoginAPIView(APIView):
             
             logger.info(f"OTP [{mobile}] -> [{otp}]")
             
+            token, _ = Token.objects.get_or_create(user=user)
             
             return Response({
                 'message': 'OTP sent successfully',
+                'token': token.key
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NowAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        current_time = timezone.now()
+        
+        user = request.user
+        user.now_endpoint_count += 1
+        user.save()
+        
+        serializer = NowSerializer(data={'now': current_time})
+        serializer.is_valid()
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class StatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        data = {
+            'user': user.mobile,
+            'open_count': user.now_endpoint_count
+        }
+        
+        serializer = StatsSerializer(data=data)
+        serializer.is_valid()
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'acc',
 ]
 
@@ -132,3 +133,10 @@ REDIS_DB = 0
 OTP_EXPIRY_SECONDS = 300
 
 AUTH_USER_MODEL = 'acc.Cuser'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
